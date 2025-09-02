@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -17,6 +18,54 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Add response interceptor to handle messages and errors
+api.interceptors.response.use(
+  (response) => {
+    // Handle successful responses
+    const { data } = response;
+
+    // Show success message if provided by backend
+    if (data?.message) {
+      toast.success(data.message);
+    }
+
+    return response;
+  },
+  (error) => {
+    // Handle error responses
+    const { response } = error;
+
+    if (response?.data?.message) {
+      // Show error message from backend
+      toast.error(response.data.message);
+    } else if (response?.data?.error) {
+      // Alternative error field
+      toast.error(response.data.error);
+    } else if (response?.status === 401) {
+      // Unauthorized
+      toast.error("Authentication failed. Please login again.");
+      localStorage.removeItem("auth_token");
+    } else if (response?.status === 403) {
+      // Forbidden
+      toast.error("You don't have permission to perform this action.");
+    } else if (response?.status === 404) {
+      // Not found
+      toast.error("Resource not found.");
+    } else if (response?.status >= 500) {
+      // Server errors
+      toast.error("Server error. Please try again later.");
+    } else if (error.code === "NETWORK_ERROR" || !response) {
+      // Network errors
+      toast.error("Network error. Please check your connection.");
+    } else {
+      // Generic error
+      toast.error("An unexpected error occurred.");
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 // Generic API functions
 const apiService = {
