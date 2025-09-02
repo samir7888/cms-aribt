@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Eye,
-  Download,
-  Search,
-  Filter,
-  Loader2,
-  Plus,
-  FileText,
-} from "lucide-react";
+import { Eye, Download, Search, Loader2, Plus, FileText } from "lucide-react";
 import { useApiHooks } from "../../services/api";
 
 interface Registration {
@@ -16,6 +8,7 @@ interface Registration {
   email: string;
   contactno: string;
   payment?: string; // URL to payment file
+  verified: "yes" | "no";
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
@@ -31,7 +24,9 @@ export default function Registration() {
     error,
   } = registrationsApi.getAll;
   const createRegistration = registrationsApi.create;
+  const updateRegistration = registrationsApi.update;
   const deleteRegistration = registrationsApi.delete;
+  const updateStatus = registrationsApi.updateStatus;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegistration, setSelectedRegistration] =
@@ -186,6 +181,9 @@ export default function Registration() {
                   Payment
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Registration Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -223,6 +221,27 @@ export default function Registration() {
                     ) : (
                       <span className="text-gray-400">No payment</span>
                     )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() =>
+                        updateStatus.mutate({
+                          id: registration.id,
+                          status:
+                            registration.verified === "yes" ? "no" : "yes",
+                        })
+                      }
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        registration.verified === "yes"
+                          ? "bg-green-100 text-green-800 hover:bg-green-200"
+                          : "bg-red-100 text-red-800 hover:bg-red-200"
+                      }`}
+                      disabled={updateStatus.isPending}
+                    >
+                      {registration.verified === "yes"
+                        ? "Verified"
+                        : "Unverified"}
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(registration.createdAt).toLocaleDateString()}

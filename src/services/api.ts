@@ -171,8 +171,8 @@ export const useApiHooks = () => {
     return useMutation({
       mutationFn: apiService.login,
       onSuccess: (data) => {
-        if (data.token) {
-          localStorage.setItem("auth_token", data.token);
+        if (data.access_token) {
+          localStorage.setItem("auth_token", data.access_token);
         }
       },
     });
@@ -182,15 +182,41 @@ export const useApiHooks = () => {
   const useSponsors = () => ({
     getAll: useGetAll("sponsers", "sponsors"),
     getById: (id: number | string) => useGetById("sponsers", id, "sponsor"),
-    create: useCreate("sponsers", "sponsors"),
-    update: useUpdate("sponsers", "sponsors"),
-    delete: useDelete("sponsers", "sponsors"),
+    create: useMutation({
+      mutationFn: (data: any) => apiService.create("sponsers", data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["sponsors"] });
+        toast.success("Sponsor added successfully!");
+      },
+    }),
+    update: useMutation({
+      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+        apiService.update("sponsers", id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["sponsors"] });
+        toast.success("Sponsor updated successfully!");
+      },
+    }),
+    delete: useMutation({
+      mutationFn: (id: number | string) => apiService.delete("sponsers", id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["sponsors"] });
+        toast.success("Sponsor removed successfully!");
+      },
+    }),
   });
 
   // About/Hackathon Info hooks
   const useHackathonInfo = () => ({
     get: useGetAll("abouthackerthon", "hackathon-info"),
-    update: useUpdate("abouthackerthon", "hackathon-info"),
+    update: useMutation({
+      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+        apiService.update("abouthackerthon", id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["hackathon-info"] });
+        toast.success("Hackathon information updated successfully!");
+      },
+    }),
   });
 
   // Registration hooks
@@ -198,14 +224,40 @@ export const useApiHooks = () => {
     getAll: useGetAll("registrationformhacker", "registrations"),
     getById: (id: number | string) =>
       useGetById("registrationformhacker", id, "registration"),
-    create: useCreate("registrationformhacker", "registrations"),
-    update: useUpdate("registrationformhacker", "registrations"),
-    delete: useDelete("registrationformhacker", "registrations"),
-    updateStatus: useMutation({
-      mutationFn: ({ id, status }: { id: number | string; status: string }) =>
-        apiService.update("registrationformhacker", id, { status }),
+    create: useMutation({
+      mutationFn: (data: any) =>
+        apiService.create("registrationformhacker", data),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["registrations"] });
+        toast.success("Registration created successfully!");
+      },
+    }),
+    update: useMutation({
+      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+        apiService.update("registrationformhacker", id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["registrations"] });
+        toast.success("Registration updated successfully!");
+      },
+    }),
+    delete: useMutation({
+      mutationFn: (id: number | string) =>
+        apiService.delete("registrationformhacker", id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["registrations"] });
+        toast.success("Registration deleted successfully!");
+      },
+    }),
+    updateStatus: useMutation({
+      mutationFn: ({ id, status }: { id: number | string; status: string }) =>
+        apiService.update("registrationformhacker", id, { verified: status }),
+      onSuccess: (_, { status }) => {
+        queryClient.invalidateQueries({ queryKey: ["registrations"] });
+        toast.success(
+          `Registration ${
+            status === "yes" ? "verified" : "unverified"
+          } successfully!`
+        );
       },
     }),
   });
@@ -215,9 +267,29 @@ export const useApiHooks = () => {
     getAll: useGetAll("supportingpartners", "partners"),
     getById: (id: number | string) =>
       useGetById("supportingpartners", id, "partner"),
-    create: useCreate("supportingpartners", "partners"),
-    update: useUpdate("supportingpartners", "partners"),
-    delete: useDelete("supportingpartners", "partners"),
+    create: useMutation({
+      mutationFn: (data: any) => apiService.create("supportingpartners", data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["partners"] });
+        toast.success("Partner added successfully!");
+      },
+    }),
+    update: useMutation({
+      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+        apiService.update("supportingpartners", id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["partners"] });
+        toast.success("Partner updated successfully!");
+      },
+    }),
+    delete: useMutation({
+      mutationFn: (id: number | string) =>
+        apiService.delete("supportingpartners", id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["partners"] });
+        toast.success("Partner removed successfully!");
+      },
+    }),
   });
 
   // Team Members hooks
@@ -225,18 +297,57 @@ export const useApiHooks = () => {
     getAll: useGetAll("teamsmemberhacker", "team-members"),
     getById: (id: number | string) =>
       useGetById("teamsmemberhacker", id, "team-member"),
-    create: useCreate("teamsmemberhacker", "team-members"),
-    update: useUpdate("teamsmemberhacker", "team-members"),
-    delete: useDelete("teamsmemberhacker", "team-members"),
+    create: useMutation({
+      mutationFn: (data: any) => apiService.create("teamsmemberhacker", data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["team-members"] });
+        toast.success("Team member added successfully!");
+      },
+    }),
+    update: useMutation({
+      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+        apiService.update("teamsmemberhacker", id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["team-members"] });
+        toast.success("Team member updated successfully!");
+      },
+    }),
+    delete: useMutation({
+      mutationFn: (id: number | string) =>
+        apiService.delete("teamsmemberhacker", id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["team-members"] });
+        toast.success("Team member removed successfully!");
+      },
+    }),
   });
 
   // Hackers/Teams hooks
   const useHackers = () => ({
     getAll: useGetAll("hackers", "teams"),
     getById: (id: number | string) => useGetById("hackers", id, "team"),
-    create: useCreate("hackers", "teams"),
-    update: useUpdate("hackers", "teams"),
-    delete: useDelete("hackers", "teams"),
+    create: useMutation({
+      mutationFn: (data: any) => apiService.create("hackers", data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["teams"] });
+        toast.success("Team created successfully!");
+      },
+    }),
+    update: useMutation({
+      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+        apiService.update("hackers", id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["teams"] });
+        toast.success("Team updated successfully!");
+      },
+    }),
+    delete: useMutation({
+      mutationFn: (id: number | string) => apiService.delete("hackers", id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["teams"] });
+        toast.success("Team deleted successfully!");
+      },
+    }),
     getHackers: useGetAll("hackers", "hackers"),
   });
 

@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import "./App.css";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
+    localStorage.clear();
     setIsAuthenticated(false);
   };
+  useEffect(() => {
+    const auth = localStorage.getItem("auth_token");
+    if (auth) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   return (
     <div className="App">

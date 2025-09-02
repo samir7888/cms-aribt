@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Lock, User } from "lucide-react";
-import toast from "react-hot-toast";
 import { useApiHooks } from "../services/api";
 
 interface LoginProps {

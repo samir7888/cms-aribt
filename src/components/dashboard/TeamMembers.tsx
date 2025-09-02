@@ -18,7 +18,15 @@ interface TeamMember {
   email: string;
   contactno: string;
   image?: string;
-  Registrationformhackerid?: any; // Registration object
+  Registrationformhacker?: {
+    id: string;
+    teamname: string;
+    email: string;
+    contactno: string;
+    verified: "yes" | "no";
+    createdAt: string;
+    updatedAt: string;
+  };
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
@@ -107,9 +115,9 @@ export default function TeamMembers() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-800">{member.name}</h4>
-                  {member.Registrationformhackerid && (
+                  {member.Registrationformhacker && (
                     <p className="text-sm text-blue-600">
-                      Team: {member.Registrationformhackerid.teamname || "N/A"}
+                      Team: {member.Registrationformhacker.teamname || "N/A"}
                     </p>
                   )}
                 </div>
@@ -235,7 +243,7 @@ function MemberForm({
     github: member?.github || "",
     email: member?.email || "",
     contactno: member?.contactno || "",
-    registrationId: member?.Registrationformhackerid?.id || "",
+    registrationId: member?.Registrationformhacker?.id || "",
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(member?.image || "");
@@ -258,17 +266,12 @@ function MemberForm({
     formDataToSend.append("email", formData.email);
     formDataToSend.append("contactno", formData.contactno);
 
-    // Add registration object
+    // Add registration ID
     if (formData.registrationId) {
-      const selectedRegistration = registrations.find(
-        (r) => r.id === formData.registrationId
+      formDataToSend.append(
+        "registrationformhackerid",
+        formData.registrationId
       );
-      if (selectedRegistration) {
-        formDataToSend.append(
-          "Registrationformhackerid",
-          JSON.stringify(selectedRegistration)
-        );
-      }
     }
 
     if (selectedFile) {
