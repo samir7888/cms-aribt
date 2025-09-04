@@ -24,7 +24,6 @@ export default function Registration() {
     error,
   } = registrationsApi.getAll;
   const createRegistration = registrationsApi.create;
-  const updateRegistration = registrationsApi.update;
   const deleteRegistration = registrationsApi.delete;
   const updateStatus = registrationsApi.updateStatus;
 
@@ -238,7 +237,9 @@ export default function Registration() {
                       }`}
                       disabled={updateStatus.isPending}
                     >
-                      {registration.verified === "yes"
+                      {updateStatus.isPending
+                        ? "Verifying..."
+                        : registration.verified === "yes"
                         ? "Verified"
                         : "Unverified"}
                     </button>

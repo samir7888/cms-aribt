@@ -50,7 +50,7 @@ export default function About() {
       updateHackathon.mutate(
         { id: hackathonInfo.id, data: requestData },
         {
-          onSuccess: (response) => {
+          onSuccess: () => {
             setHackathonInfo({
               ...hackathonInfo,
               description: editDescription,

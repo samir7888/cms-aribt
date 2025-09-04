@@ -138,34 +138,6 @@ export const useApiHooks = () => {
     });
   };
 
-  const useCreate = (endpoint: string, queryKey: string) => {
-    return useMutation({
-      mutationFn: (data: any) => apiService.create(endpoint, data),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-      },
-    });
-  };
-
-  const useUpdate = (endpoint: string, queryKey: string) => {
-    return useMutation({
-      mutationFn: ({ id, data }: { id: number | string; data: any }) =>
-        apiService.update(endpoint, id, data),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-      },
-    });
-  };
-
-  const useDelete = (endpoint: string, queryKey: string) => {
-    return useMutation({
-      mutationFn: (id: number | string) => apiService.delete(endpoint, id),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [queryKey] });
-      },
-    });
-  };
-
   // Authentication hooks
   const useLogin = () => {
     return useMutation({
