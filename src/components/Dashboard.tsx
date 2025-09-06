@@ -7,18 +7,25 @@ import {
   LogOut,
   Menu,
   X,
+  UserPlus,
 } from "lucide-react";
 
 import Sponsors from "./dashboard/Sponsors";
 import About from "./dashboard/About";
 import Partners from "./dashboard/Partners";
 import TeamMembers from "./dashboard/TeamMembers";
+import Registration from "./dashboard/Registration";
 
 interface DashboardProps {
   onLogout: () => void;
 }
 
-type ActiveSection = "sponsors" | "about" | "partners" | "team";
+type ActiveSection =
+  | "sponsors"
+  | "about"
+  | "partners"
+  | "team"
+  | "registration";
 
 export default function Dashboard({ onLogout }: DashboardProps) {
   const [activeSection, setActiveSection] = useState<ActiveSection>("sponsors");
@@ -33,6 +40,11 @@ export default function Dashboard({ onLogout }: DashboardProps) {
       icon: Handshake,
     },
     { id: "team" as ActiveSection, label: "Team Members", icon: Users },
+    {
+      id: "registration" as ActiveSection,
+      label: "Registration",
+      icon: UserPlus,
+    },
   ];
 
   const renderContent = () => {
@@ -45,7 +57,8 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         return <Partners />;
       case "team":
         return <TeamMembers />;
-
+      case "registration":
+        return <Registration />;
       default:
         return <Sponsors />;
     }
