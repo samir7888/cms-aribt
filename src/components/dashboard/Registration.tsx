@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Eye, Download, Search, Loader2, Plus, FileText } from "lucide-react";
+import {
+  Eye,
+  Download,
+  Search,
+  Loader2,
+  Plus,
+  FileText,
+  User,
+  CloudCog,
+} from "lucide-react";
 import { useApiHooks } from "../../services/api";
 
 interface Registration {
@@ -14,8 +23,28 @@ interface Registration {
   deletedAt?: string | null;
 }
 
+interface TeamMember {
+  id: string;
+  name: string;
+  github: string;
+  email: string;
+  contactno: string;
+  image?: string;
+  Registrationformhacker?: {
+    id: string;
+    teamname: string;
+    email: string;
+    contactno: string;
+    verified: "yes" | "no";
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function Registration() {
-  const { useRegistrations } = useApiHooks();
+  const { useRegistrations, useTeamMembers } = useApiHooks();
   const registrationsApi = useRegistrations();
 
   const {
@@ -310,72 +339,178 @@ export default function Registration() {
 
       {/* Registration Detail Modal */}
       {selectedRegistration && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Registration Details</h3>
-              <button
-                onClick={() => setSelectedRegistration(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
+        <RegistrationDetailModal
+          registration={selectedRegistration}
+          onClose={() => setSelectedRegistration(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+interface RegistrationDetailModalProps {
+  registration: Registration;
+  onClose: () => void;
+}
+
+function RegistrationDetailModal({
+  registration,
+  onClose,
+}: RegistrationDetailModalProps) {
+  const { useTeamMembers } = useApiHooks();
+  const teamMembersApi = useTeamMembers();
+
+  const { data: allTeamMembers = [], isLoading: membersLoading } =
+    teamMembersApi.getAll;
+
+  // Filter team members by registration ID
+  const teamMembers = allTeamMembers.filter(
+    (member: TeamMember) =>
+      member.Registrationformhacker?.teamname === registration.teamname
+  );
+  return (
+    <div className="fixed inset-0 bg-black/90 bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-semibold">Registration Details</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {/* Basic Registration Info */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Team Name
+              </label>
+              <p className="text-gray-800 font-semibold">
+                {registration.teamname}
+              </p>
             </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Team Name
-                  </label>
-                  <p className="text-gray-800">
-                    {selectedRegistration.teamname}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <p className="text-gray-800">{selectedRegistration.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Contact Number
-                  </label>
-                  <p className="text-gray-800">
-                    {selectedRegistration.contactno}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Registration Date
-                  </label>
-                  <p className="text-gray-800">
-                    {new Date(selectedRegistration.createdAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              {selectedRegistration.payment && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Payment Proof
-                  </label>
-                  <a
-                    href={selectedRegistration.payment}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                  >
-                    <FileText className="w-4 h-4" />
-                    View Payment Document
-                  </a>
-                </div>
-              )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <p className="text-gray-800">{registration.email}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Contact Number
+              </label>
+              <p className="text-gray-800">{registration.contactno}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Registration Date
+              </label>
+              <p className="text-gray-800">
+                {new Date(registration.createdAt).toLocaleString()}
+              </p>
             </div>
           </div>
+
+          {/* Payment Info */}
+          {registration.payment && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Payment Proof
+              </label>
+              <a
+                href={registration.payment}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              >
+                <FileText className="w-4 h-4" />
+                View Payment Document
+              </a>
+            </div>
+          )}
+
+          {/* Team Members Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Team Members
+            </label>
+
+            {membersLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">
+                  Loading team members...
+                </span>
+              </div>
+            ) : teamMembers.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {teamMembers.map((member: TeamMember) => (
+                  <div
+                    key={member.id}
+                    className="bg-gray-50 rounded-lg p-4 border"
+                  >
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="size-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                        {member.image ? (
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="size-24 rounded-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-6 h-6 text-gray-400" />
+                        )}
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold text-gray-800">
+                          {member.name}
+                        </h4>
+                        <p className="text-sm text-gray-600">{member.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 text-sm text-gray-600">
+                      <p>
+                        <span className="font-medium">Contact:</span>{" "}
+                        {member.contactno}
+                      </p>
+                      {member.github && (
+                        <p>
+                          <span className="font-medium">GitHub:</span>{" "}
+                          <a
+                            href={
+                              member.github.startsWith("http")
+                                ? member.github
+                                : `https://github.com/${member.github}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            {member.github}
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <User className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                <p>No team members found for this registration</p>
+                <p className="text-sm">
+                  Team members may not have been added yet
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
