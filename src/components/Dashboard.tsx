@@ -3,7 +3,6 @@ import {
   Users,
   Trophy,
   FileText,
-  UserPlus,
   Handshake,
   LogOut,
   Menu,
@@ -12,7 +11,6 @@ import {
 
 import Sponsors from "./dashboard/Sponsors";
 import About from "./dashboard/About";
-import Registration from "./dashboard/Registration";
 import Partners from "./dashboard/Partners";
 import TeamMembers from "./dashboard/TeamMembers";
 
@@ -20,13 +18,7 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type ActiveSection =
-  | "sponsors"
-  | "about"
-  | "registration"
-  | "partners"
-  | "team"
-  | "hackers";
+type ActiveSection = "sponsors" | "about" | "partners" | "team";
 
 export default function Dashboard({ onLogout }: DashboardProps) {
   const [activeSection, setActiveSection] = useState<ActiveSection>("sponsors");
@@ -35,11 +27,6 @@ export default function Dashboard({ onLogout }: DashboardProps) {
   const menuItems = [
     { id: "sponsors" as ActiveSection, label: "Sponsors", icon: Trophy },
     { id: "about" as ActiveSection, label: "About Hackathon", icon: FileText },
-    {
-      id: "registration" as ActiveSection,
-      label: "Registration Form",
-      icon: UserPlus,
-    },
     {
       id: "partners" as ActiveSection,
       label: "Supporting Partners",
@@ -54,8 +41,6 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         return <Sponsors />;
       case "about":
         return <About />;
-      case "registration":
-        return <Registration />;
       case "partners":
         return <Partners />;
       case "team":
