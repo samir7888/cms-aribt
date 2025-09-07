@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Eye,
   Download,
@@ -10,6 +10,7 @@ import {
   CloudCog,
 } from "lucide-react";
 import { useApiHooks } from "../../services/api";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 
 interface Registration {
   id: string;
@@ -258,7 +259,7 @@ export default function Registration() {
                             registration.verified === "yes" ? "no" : "yes",
                         })
                       }
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      className={`px-3 py-1  cursor-pointer rounded-full text-xs font-medium ${
                         registration.verified === "yes"
                           ? "bg-green-100 text-green-800 hover:bg-green-200"
                           : "bg-red-100 text-red-800 hover:bg-red-200"
@@ -276,18 +277,18 @@ export default function Registration() {
                     {new Date(registration.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex gap-2">
+                    <div className="flex gap-4">
                       <button
                         onClick={() => setSelectedRegistration(registration)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 hover:text-blue-900 border border-neutral-300 px-4 py-1 cursor-pointer rounded-2xl"
                       >
-                        <Eye className="w-4 h-4" />
+                        View
                       </button>
                       <button
                         onClick={() =>
                           handleDeleteRegistration(registration.id)
                         }
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600  cursor-pointer hover:text-red-900"
                         disabled={deleteRegistration.isPending}
                       >
                         Delete
@@ -357,6 +358,8 @@ function RegistrationDetailModal({
   registration,
   onClose,
 }: RegistrationDetailModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const { useTeamMembers } = useApiHooks();
   const teamMembersApi = useTeamMembers();
 
@@ -368,9 +371,13 @@ function RegistrationDetailModal({
     (member: TeamMember) =>
       member.Registrationformhacker?.teamname === registration.teamname
   );
+  useOutsideClick(modalRef, () => onClose());
   return (
     <div className="fixed inset-0 bg-black/90 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+      >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold">Registration Details</h3>
           <button
