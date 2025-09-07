@@ -8,6 +8,7 @@ import {
   User,
   Loader2,
   Github,
+  Download,
 } from "lucide-react";
 import { useApiHooks } from "../../services/api";
 
@@ -68,6 +69,45 @@ export default function TeamMembers() {
     }
   };
 
+  const exportData = () => {
+    const csvContent = [
+      [
+        "Name",
+        "Email",
+        "Contact Number",
+        "GitHub Profile",
+        "Profile Image URL",
+        "Team Name",
+        "Team Email",
+        "Team Status",
+        "Member Added Date",
+      ],
+      ...members.map((member: TeamMember) => [
+        member.name,
+        member.email,
+        member.contactno,
+        member.github || "N/A",
+        member.image || "N/A",
+        member.Registrationformhacker?.teamname || "N/A",
+        member.Registrationformhacker?.email || "N/A",
+        member.Registrationformhacker?.verified === "yes"
+          ? "Verified"
+          : "Unverified",
+        new Date(member.createdAt).toLocaleDateString(),
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "team_members.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -88,13 +128,22 @@ export default function TeamMembers() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-800">Team Members</h3>
-        <button
-          onClick={handleAddMember}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Member
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={exportData}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={handleAddMember}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Member
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

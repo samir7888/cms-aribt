@@ -446,55 +446,39 @@ function RegistrationDetailModal({
                 </span>
               </div>
             ) : teamMembers.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2  gap-4">
                 {teamMembers.map((member: TeamMember) => (
                   <div
                     key={member.id}
-                    className="bg-gray-50 rounded-lg p-4 border"
+                    className=" group relative w-[400px] h-[400px]  bg-gray-50 border border-neutral-300 rounded-2xl overflow-hidden"
                   >
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className="size-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                        {member.image ? (
-                          <img
-                            src={member.image}
-                            alt={member.name}
-                            className="size-24 rounded-full object-cover"
-                          />
-                        ) : (
-                          <User className="w-6 h-6 text-gray-400" />
-                        )}
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold text-gray-800">
-                          {member.name}
-                        </h4>
-                        <p className="text-sm text-gray-600">{member.email}</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <p>
-                        <span className="font-medium">Contact:</span>{" "}
-                        {member.contactno}
-                      </p>
-                      {member.github && (
-                        <p>
-                          <span className="font-medium">GitHub:</span>{" "}
-                          <a
-                            href={
-                              member.github.startsWith("http")
-                                ? member.github
-                                : `https://github.com/${member.github}`
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            {member.github}
-                          </a>
-                        </p>
+                    <div className="absolute opacity-50 inset-0 top-0 bg-gradient-to-b from-neutral-500 to-black"></div>
+                    <div className="absoulte inset-0 ">
+                      {member.image ? (
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full inset-0  object-contain"
+                        />
+                      ) : (
+                        <User className="w-6 h-6 text-gray-400" />
                       )}
+                      <div className="absolute top-2/3 left-8 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 duration-300 transition-all ">
+                        <h2 className="text-2xl capitalize font-bold text-yellow-500">
+                          {member.name}
+                        </h2>
+                        <p className="text-white">{member.email}</p>
+                        <p className="text-base text-white">
+                          {member.contactno}
+                        </p>
+                        <a
+                          href={member.github}
+                          target="_blank"
+                          className="text-base text-white"
+                        >
+                          Github: {member.github}
+                        </a>
+                      </div>
                     </div>
                   </div>
                 ))}
